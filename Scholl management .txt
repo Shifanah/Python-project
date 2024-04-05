@@ -1,0 +1,92 @@
+from sqlalchemy import create_engine, Column, Integer, String, Date
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# Creating the database engine
+engine = create_engine('sqlite:///school_management.db', echo=True)
+
+# Creating a base class for our ORM models
+Base = declarative_base()
+
+# Defining the Teacher model
+class Teacher(Base):
+    __tablename__ = 'teachers'
+    sno = Column(Integer, primary_key=True)
+    teacherId = Column(Integer)
+    teacherName = Column(String)
+    teacherSalary = Column(Integer)
+    teacherJoiningDate = Column(Date)
+
+# Defining the Student model
+class Student(Base):
+    __tablename__ = 'students'
+    sno = Column(Integer, primary_key=True)
+    studentId = Column(Integer)
+    studentName = Column(String)
+    pythonMark = Column(Integer)
+    MathMark = Column(Integer)
+    PhysicsMark = Column(Integer)
+
+# Defining the Principal model
+class Principal(Base):
+    __tablename__ = 'principals'
+    sno = Column(Integer, primary_key=True)
+    teacherId = Column(Integer)
+    teacherName = Column(String)
+    teacherSalary = Column(Integer)
+    teacherJoiningDate = Column(Date)
+
+# Defining the Admin model
+class Admin(Base):
+    __tablename__ = 'admins'
+    sno = Column(Integer, primary_key=True)
+    adminId = Column(Integer)
+    adminName = Column(String)
+    adminPassword = Column(String)
+
+# Creating tables in the database
+Base.metadata.create_all(engine)
+
+# Creating a session
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Function to create a student
+def create_student(student_id, student_name, python_mark, math_mark, physics_mark):
+    new_student = Student(studentId=student_id, studentName=student_name, pythonMark=python_mark, MathMark=math_mark, PhysicsMark=physics_mark)
+    session.add(new_student)
+    session.commit()
+
+# Function to read a student
+def read_student(student_id):
+    student = session.query(Student).filter_by(studentId=student_id).first()
+    if student:
+        print(f"Student ID: {student.studentId}, Student Name: {student.studentName}, Python Mark: {student.pythonMark}, Math Mark: {student.MathMark}, Physics Mark: {student.PhysicsMark}")
+    else:
+        print("Student not found.")
+
+# Function to update a student
+def update_student(student_id, new_name):
+    student = session.query(Student).filter_by(studentId=student_id).first()
+    if student:
+        student.studentName = new_name
+        session.commit()
+        print("Student updated successfully.")
+    else:
+        print("Student not found.")
+
+# Function to delete a student
+def delete_student(student_id):
+    student = session.query(Student).filter_by(studentId=student_id).first()
+    if student:
+        session.delete(student)
+        session.commit()
+        print("Student deleted successfully.")
+    else:
+        print("Student not found.")
+
+# Example usage
+create_student(1, "John Doe", 90, 85, 88)
+read_student(1)
+update_student(1, "Jane Doe")
+delete_student(1)
